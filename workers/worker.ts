@@ -9,7 +9,7 @@ type SyncJob = { shopDomain: string };
 
 async function main() {
   if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL is required.");
-  const boss = new PgBoss({ connectionString: process.env.DATABASE_URL, application_name: "kern iq-worker" });
+  const boss = new PgBoss({ connectionString: process.env.DATABASE_URL, application_name: "kerniq-worker" });
   boss.on("error", (error) => console.error("[worker]", error));
   boss.on("failed", ({ job, error }) => console.error("[worker] job failed", job.id, error));
   await boss.start();
