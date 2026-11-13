@@ -27,9 +27,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 };
 
 const descriptions = [
-  { name: LAUNCH_PLAN, price: "$29", detail: "Core product intelligence and offer management." },
-  { name: GROWTH_PLAN, price: "$79", detail: "Advanced experimentation and higher operating limits." },
-  { name: SCALE_PLAN, price: "$149", detail: "Expanded limits and advanced analytics." },
+  { name: LAUNCH_PLAN, price: "$29", detail: "3 cart offers · up to 1,000 recent orders analyzed." },
+  { name: GROWTH_PLAN, price: "$79", detail: "15 cart offers · up to 3,000 recent orders analyzed." },
+  { name: SCALE_PLAN, price: "$149", detail: "50 cart offers · up to 5,000 recent orders analyzed." },
 ];
 
 export default function Billing() {
