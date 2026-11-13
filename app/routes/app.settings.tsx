@@ -8,7 +8,7 @@ import { syncRecentOrders } from "../lib/orders.server";
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { session } = await authenticate.admin(request);
   const store = await db.store.findUnique({ where: { shopDomain: session.shop } });
-  return { shop: session.shop, lastCatalogSync: store?.lastCatalogSync?.toISOString() ?? null };
+  return { shop: session.shop, lastCatalogSync: store?.lastCatalogSync?.toISOString() ?? null, lastOrderSync: store?.lastOrderSync?.toISOString() ?? null };
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -29,10 +29,10 @@ export default function Settings() {
   const result = useActionData<typeof action>();
   return <main className="admin-shell">
     <header className="admin-heading"><div><p className="eyebrow">CONFIGURATION</p><h1>Settings</h1><p className="muted">{data.shop}</p></div></header>
-    <section className="panel"><h2>Shopify data connection</h2><p>KERNIQ reads product and variant data, including inventory and unit cost when Shopify exposes it to the app. Missing costs remain unknown.</p><div className="status-row"><span>Last catalog sync</span><strong>{data.lastCatalogSync ? new Date(data.lastCatalogSync).toLocaleString() : "Never"}</strong></div><Form method="post"><button className="button button-primary" type="submit">Sync catalog now</button></Form>
+    <section className="panel"><h2>Shopify data connection</h2><p>KERNIQ reads product and variant data, including inventory and unit cost when Shopify exposes it to the app. Missing costs remain unknown.</p><div className="status-row"><span>Last catalog sync</span><strong>{data.lastCatalogSync ? new Date(data.lastCatalogSync).toLocaleString() : "Never"}</strong></div><div className="status-row"><span>Last order sync</span><strong>{data.lastOrderSync ? new Date(data.lastOrderSync).toLocaleString() : "Never"}</strong></div><Form method="post"><button className="button button-primary" type="submit">Sync catalog now</button></Form>
       {result && "success" in result && result.success ? <p className="form-success">Synced {result.variantsRead.toLocaleString()} variants and {result.ordersRead.toLocaleString()} orders from the last {result.orderWindowDays} days.</p> : null}
       {result && "error" in result && result.error ? <p className="form-error">Sync failed: {result.error}</p> : null}
     </section>
-    <section className="panel"><h2>Data integrity</h2><ul className="plain-list"><li>Money is stored as integer minor units.</li><li>Unit cost is sourced from Shopify inventory item cost.</li><li>Unknown cost is not replaced with an estimate.</li><li>Catalog sync is tenant-scoped to the authenticated shop.</li></ul></section>
+    <section className="panel"><h2>Data integrity</h2><ul className="plain-list"><li>Money is stored as integer minor units.</li><li>Unit cost is sourced from Shopify inventory item cost.</li><li>Unknown cost is not replaced with an estimate.</li><li>Catalog and order sync are tenant-scoped to the authenticated shop. Order history is limited to the most recent 60 days under the default Shopify access window.</li></ul></section>
   </main>;
 }
