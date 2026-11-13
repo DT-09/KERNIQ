@@ -48,9 +48,11 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   const offer = await db.offer.findFirst({
     where: { id: offerId, shopDomain: session.shop, status: "active" },
-    select: { id: true },
+    select: { id: true, config: true },
   });
   if (!offer) return new Response(null, { status: 403 });
+  const offerConfig = offer.config && typeof offer.config === "object" ? offer.config as Record<string, unknown> : {};
+  if (offerConfig.productShopifyId !== productShopifyId) return new Response(null, { status: 400 });
 
   try {
     await db.offerEvent.create({
