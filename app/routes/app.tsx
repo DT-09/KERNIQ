@@ -1,12 +1,20 @@
 import { AppProvider } from "@shopify/shopify-app-react-router/react";
 import { NavMenu } from "@shopify/app-bridge-react";
-import { Link, Outlet, useLoaderData, useRouteError } from "react-router";
+import { Link, Outlet, redirect, useLoaderData, useRouteError } from "react-router";
 import type { HeadersFunction, LoaderFunctionArgs } from "react-router";
 import { boundary } from "@shopify/shopify-app-react-router/server";
-import { authenticate } from "../shopify.server";
+import { authenticate, GROWTH_PLAN, LAUNCH_PLAN, SCALE_PLAN, isBillingTestMode } from "../shopify.server";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  await authenticate.admin(request);
+  const { billing } = await authenticate.admin(request);
+  const url = new URL(request.url);
+  if (url.pathname !== "/app/billing") {
+    const status = await billing.check({
+      plans: [LAUNCH_PLAN, GROWTH_PLAN, SCALE_PLAN],
+      isTest: isBillingTestMode,
+    });
+    if (!status.hasActivePayment) throw redirect("/app/billing");
+  }
   return { apiKey: process.env.SHOPIFY_API_KEY ?? "" };
 };
 
@@ -20,6 +28,7 @@ export default function EmbeddedApp() {
         <Link to="/app/offers">Offers</Link>
         <Link to="/app/analytics">Analytics</Link>
         <Link to="/app/settings">Settings</Link>
+        <Link to="/app/billing">Billing</Link>
       </NavMenu>
       <Outlet />
     </AppProvider>
