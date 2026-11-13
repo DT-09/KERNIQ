@@ -1,0 +1,194 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Session {
+  id                 String    @id
+  shop               String
+  state              String
+  isOnline           Boolean   @default(false)
+  scope              String?
+  expires             DateTime?
+  accessToken        String
+  userId              BigInt?
+  firstName           String?
+  lastName            String?
+  email               String?
+  accountOwner        Boolean   @default(false)
+  locale              String?
+  collaborator        Boolean?  @default(false)
+  emailVerified       Boolean?  @default(false)
+  refreshToken        String?
+  refreshTokenExpires DateTime?
+}
+
+model Store {
+  shopDomain       String   @id
+  currencyCode     String?
+  timezone         String?
+  installedAt      DateTime @default(now())
+  lastCatalogSync  DateTime?
+  lastOrderSync    DateTime?
+  products         Product[]
+  orders           Order[]
+  offers           Offer[]
+  events           OfferEvent[]
+  experiments      Experiment[]
+  syncRuns         SyncRun[]
+  settings         StoreSettings?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model StoreSettings {
+  shopDomain       String   @id
+  store            Store    @relation(fields: [shopDomain], references: [shopDomain], onDelete: Cascade)
+  defaultCurrency  String?
+  defaultCogsMode  String   @default("unknown")
+  attributionDays  Int      @default(7)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model Product {
+  id              String   @id @default(cuid())
+  shopDomain      String
+  store           Store    @relation(fields: [shopDomain], references: [shopDomain], onDelete: Cascade)
+  shopifyId       String
+  title           String
+  handle          String
+  status          String
+  productType     String?
+  vendor          String?
+  tags            String[]
+  imageUrl        String?
+  variants        Variant[]
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  @@unique([shopDomain, shopifyId])
+  @@index([shopDomain, status])
+}
+
+model Variant {
+  id              String   @id @default(cuid())
+  productId       String
+  product         Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  shopifyId       String
+  title           String
+  sku             String?
+  priceMinor      Int
+  compareAtMinor  Int?
+  inventoryQty    Int?
+  unitCostMinor   Int?
+  costSource      String   @default("unknown")
+  updatedAt       DateTime @updatedAt
+  @@unique([productId, shopifyId])
+}
+
+model Order {
+  id                String   @id @default(cuid())
+  shopDomain        String
+  store             Store    @relation(fields: [shopDomain], references: [shopDomain], onDelete: Cascade)
+  shopifyId         String
+  orderNumber       String?
+  currencyCode      String
+  financialStatus   String?
+  fulfillmentStatus String?
+  createdAtShopify  DateTime
+  processedAt       DateTime?
+  subtotalMinor    Int
+  discountMinor    Int
+  refundMinor      Int
+  totalMinor       Int
+  lineItems         OrderLineItem[]
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  @@unique([shopDomain, shopifyId])
+  @@index([shopDomain, createdAtShopify])
+}
+
+model OrderLineItem {
+  id               String   @id @default(cuid())
+  orderId          String
+  order             Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  shopifyLineId    String
+  variantShopifyId String?
+  productShopifyId String?
+  title            String
+  quantity         Int
+  unitPriceMinor   Int
+  discountMinor    Int
+  refundMinor      Int
+  @@unique([orderId, shopifyLineId])
+}
+
+model Offer {
+  id              String   @id @default(cuid())
+  shopDomain      String
+  store           Store    @relation(fields: [shopDomain], references: [shopDomain], onDelete: Cascade)
+  name            String
+  status          String   @default("draft")
+  placement       String
+  config          Json
+  minimumMarginBps Int?
+  startsAt        DateTime?
+  endsAt          DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  events          OfferEvent[]
+  @@index([shopDomain, status])
+}
+
+model OfferEvent {
+  id              String   @id @default(cuid())
+  shopDomain      String
+  store           Store    @relation(fields: [shopDomain], references: [shopDomain], onDelete: Cascade)
+  offerId         String?
+  offer           Offer?   @relation(fields: [offerId], references: [id], onDelete: SetNull)
+  eventKey        String
+  visitorKey      String?
+  sessionKey      String?
+  orderShopifyId  String?
+  productShopifyId String?
+  revenueMinor    Int?
+  discountMinor   Int?
+  contributionMinor Int?
+  payload         Json?
+  occurredAt      DateTime @default(now())
+  @@unique([shopDomain, eventKey])
+  @@index([shopDomain, occurredAt])
+}
+
+model Experiment {
+  id              String   @id @default(cuid())
+  shopDomain      String
+  store           Store    @relation(fields: [shopDomain], references: [shopDomain], onDelete: Cascade)
+  name            String
+  status          String   @default("draft")
+  hypothesis      String
+  allocation      Json
+  startsAt        DateTime?
+  endsAt          DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  @@index([shopDomain, status])
+}
+
+model SyncRun {
+  id            String   @id @default(cuid())
+  shopDomain    String
+  store         Store    @relation(fields: [shopDomain], references: [shopDomain], onDelete: Cascade)
+  kind          String
+  status        String
+  cursor        String?
+  recordsRead   Int      @default(0)
+  errorCode     String?
+  startedAt     DateTime @default(now())
+  finishedAt    DateTime?
+  @@index([shopDomain, startedAt])
+}
