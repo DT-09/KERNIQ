@@ -36,6 +36,10 @@ CREATE TABLE "StoreSettings" (
   "defaultCurrency" TEXT,
   "defaultCogsMode" TEXT NOT NULL DEFAULT 'unknown',
   "attributionDays" INTEGER NOT NULL DEFAULT 7,
+  "paymentFeeBps" INTEGER,
+  "fulfillmentCostMinor" INTEGER,
+  "shippingSubsidyMinor" INTEGER,
+  "minimumContributionMinor" INTEGER,
   "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "updatedAt" TIMESTAMP(3) NOT NULL,
   CONSTRAINT "StoreSettings_pkey" PRIMARY KEY ("shopDomain")
