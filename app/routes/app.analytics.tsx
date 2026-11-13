@@ -1,5 +1,5 @@
 import type { LoaderFunctionArgs } from "react-router";
-import { useLoaderData } from "react-router";
+import { Link, useLoaderData } from "react-router";
 import { authenticate, GROWTH_PLAN, LAUNCH_PLAN, SCALE_PLAN, isBillingTestMode } from "../shopify.server";
 import { getPlanLimits } from "../lib/plans.server";
 import { getProductRelationships } from "../lib/relationships.server";
@@ -27,7 +27,7 @@ export default function Analytics() {
     </section>
     <section className="panel">
       <h2>Product affinity</h2>
-      {data.pairs.length === 0 ? <div className="empty-state"><h3>No relationships yet</h3><p>Sync catalog and recent orders. Pairs appear when products occur together in completed order history.</p><a className="button button-primary" href="/app/settings">Open data settings</a></div> :
+      {data.pairs.length === 0 ? <div className="empty-state"><h3>No relationships yet</h3><p>Sync catalog and recent orders. Pairs appear when products occur together in completed order history.</p><Link className="button button-primary" to="/app/settings">Open data settings</Link></div> :
         <div className="table-wrap"><table><thead><tr><th>Product A</th><th>Product B</th><th>Orders together</th><th>Support</th><th>Confidence A → B</th><th>Lift</th></tr></thead><tbody>
           {data.pairs.map((pair, index) => <tr key={index}><td>{pair.productA}</td><td>{pair.productB}</td><td>{pair.coOrders}</td><td>{percent(pair.support)}</td><td>{percent(pair.confidenceAtoB)}</td><td>{pair.lift == null ? "—" : pair.lift.toFixed(2) + "×"}</td></tr>)}
         </tbody></table></div>}
