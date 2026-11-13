@@ -1,0 +1,75 @@
+{% assign offer_product = block.settings.product %}
+{% if offer_product != blank %}
+  {% assign offer_variant = offer_product.selected_or_first_available_variant %}
+  <section class="kerniq-cart-offer" aria-label="{{ block.settings.heading | escape }}">
+    <div class="kerniq-cart-offer__copy">
+      <p class="kerniq-cart-offer__eyebrow">A CONSIDERED ADDITION</p>
+      <h3>{{ block.settings.heading | escape }}</h3>
+      {% if block.settings.description != blank %}
+        <p class="kerniq-cart-offer__description">{{ block.settings.description | escape }}</p>
+      {% endif %}
+    </div>
+    <div class="kerniq-cart-offer__product">
+      {% if offer_product.featured_image %}
+        <img
+          src="{{ offer_product.featured_image | image_url: width: 240 }}"
+          alt="{{ offer_product.featured_image.alt | default: offer_product.title | escape }}"
+          width="120"
+          height="120"
+          loading="lazy"
+        >
+      {% endif %}
+      <div class="kerniq-cart-offer__details">
+        <a href="{{ offer_product.url }}">{{ offer_product.title | escape }}</a>
+        <span>{{ offer_variant.price | money }}</span>
+        {% unless offer_variant.available %}
+          <span class="kerniq-cart-offer__unavailable">Currently unavailable</span>
+        {% endunless %}
+      </div>
+      <form method="post" action="{{ routes.cart_add_url }}" class="kerniq-cart-offer__form">
+        <input type="hidden" name="id" value="{{ offer_variant.id }}">
+        <input type="hidden" name="quantity" value="1">
+        <input type="hidden" name="return_to" value="{{ routes.cart_url }}">
+        <button type="submit" {% unless offer_variant.available %}disabled{% endunless %}>
+          {{ block.settings.button_label | escape }}
+        </button>
+      </form>
+    </div>
+  </section>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Product recommendation",
+  "target": "content",
+  "enabled_on": {
+    "templates": ["cart"]
+  },
+  "stylesheet": "cart-recommendation.css",
+  "settings": [
+    {
+      "type": "product",
+      "id": "product",
+      "label": "Recommended product"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "A useful addition"
+    },
+    {
+      "type": "text",
+      "id": "description",
+      "label": "Description",
+      "default": "Selected to complement your order."
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label",
+      "default": "Add to cart"
+    }
+  ]
+}
+{% endschema %}
