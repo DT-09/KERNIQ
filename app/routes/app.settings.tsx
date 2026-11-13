@@ -56,7 +56,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     const fulfillment = parseMoney(form.get("fulfillmentCost"), store.currencyCode);
     const shipping = parseMoney(form.get("shippingSubsidy"), store.currencyCode);
     const minimum = parseMoney(form.get("minimumContribution"), store.currencyCode);
-    if ([fulfillment, shipping, minimum].includes("invalid")) return { error: "Cost assumptions must be valid non-negative amounts in the store currency." };
+    if (fulfillment === "invalid" || shipping === "invalid" || minimum === "invalid") return { error: "Cost assumptions must be valid non-negative amounts in the store currency." };
     await db.storeSettings.upsert({
       where: { shopDomain: session.shop },
       create: {
