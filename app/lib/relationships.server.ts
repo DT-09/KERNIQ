@@ -4,12 +4,13 @@ import { rankProductPair } from "./profit.server";
 export async function getProductRelationships(shopDomain: string, maxOrders = 5000) {
   const orders = await db.order.findMany({
     where: { shopDomain },
-    select: { id: true, lineItems: { select: { productShopifyId: true } } },
+    select: { id: true, financialStatus: true, fulfillmentStatus: true, lineItems: { select: { productShopifyId: true } } },
     orderBy: { createdAtShopify: "desc" },
     take: maxOrders,
   });
 
-  const orderSets = orders.map((order) => [...new Set(
+  const eligibleOrders = orders.filter((order) => order.financialStatus !== "VOIDED" && order.fulfillmentStatus !== "CANCELLED");
+  const orderSets = eligibleOrders.map((order) => [...new Set(
     order.lineItems.map((line) => line.productShopifyId).filter((id): id is string => Boolean(id)),
   )]);
   const productOrderCounts = new Map<string, number>();
@@ -33,7 +34,8 @@ export async function getProductRelationships(shopDomain: string, maxOrders = 50
   });
   const productById = new Map(products.map((product) => [product.shopifyId, product]));
   const rows = [...pairCounts.entries()].map(([key, coOrders]) => {
-    const [a, b] = key.split("|");
+    const [firstId, secondId] = key.split("|");
+    const [a, b] = [firstId, secondId].sort((left, right) => (productOrderCounts.get(right) ?? 0) - (productOrderCounts.get(left) ?? 0) || left.localeCompare(right));
     const metrics = rankProductPair({
       coOrders,
       ordersWithA: productOrderCounts.get(a) ?? 0,
