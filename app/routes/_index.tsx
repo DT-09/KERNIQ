@@ -18,7 +18,7 @@ function Mark() {
 
 export default function Home() {
   return <div className="marketing">
-    <nav className="site-nav"><Link to="/" className="brand"><Mark/><span>KERNIQ</span></Link><div className="nav-links"><a href="#method">Method</a><a href="#platform">Platform</a><a href="#pricing">Pricing</a></div><Link to="/app" className="nav-cta">Merchant login <span>↗</span></Link></nav>
+    <nav className="site-nav"><Link to="/" className="brand"><Mark/><span>KERNIQ</span></Link><div className="nav-links"><a href="#method">Method</a><a href="#platform">Platform</a><a href="#pricing">Pricing</a></div><Link to="/login" className="nav-cta">Merchant login <span>↗</span></Link></nav>
     <main>
       <section className="hero">
         <div className="hero-copy"><p className="eyebrow">PROFIT INTELLIGENCE FOR SHOPIFY</p><h1>Every offer<br/><em>should earn</em><br/>its place.</h1><p className="hero-lede">Turn product relationships into offers with clear economics. Protect contribution margin. Measure what actually changes buyer behaviour.</p><div className="hero-actions"><a className="button button-primary" href="#platform">Explore the platform</a><a className="text-link" href="#method">How it works <span>↘</span></a></div><p className="hero-footnote">Built for operators who care about profit, not just order value.</p></div>
@@ -33,9 +33,9 @@ export default function Home() {
       </div></section>
       <section className="principle"><div><p className="eyebrow">A STRICTER STANDARD</p><h2>No invented margins.<br/>No vanity metrics.<br/><em>No false lift.</em></h2></div><p>KERNIQ is designed to show its working. Every recommendation should expose its evidence, assumptions, cost coverage, and limits. If the data cannot support a conclusion, the product should say so.</p></section>
       <section className="pricing-section" id="pricing"><p className="eyebrow">STRAIGHTFORWARD SUBSCRIPTIONS</p><h2>Choose the operating range.</h2><div className="pricing-grid">
-        <article className="plan-card"><p className="eyebrow">LAUNCH</p><h3>$29<span> / month</span></h3><p>Core product intelligence and offer management.</p><Link to="/app/billing">Continue in Shopify ↗</Link></article>
-        <article className="plan-card plan-featured"><p className="eyebrow">GROWTH</p><h3>$79<span> / month</span></h3><p>Advanced experimentation and higher operating limits.</p><Link to="/app/billing">Continue in Shopify ↗</Link></article>
-        <article className="plan-card"><p className="eyebrow">SCALE</p><h3>$149<span> / month</span></h3><p>Expanded limits and advanced analytics.</p><Link to="/app/billing">Continue in Shopify ↗</Link></article>
+        <article className="plan-card"><p className="eyebrow">LAUNCH</p><h3>$29<span> / month</span></h3><p>Core product intelligence and offer management.</p><Link to="/login">Continue in Shopify ↗</Link></article>
+        <article className="plan-card plan-featured"><p className="eyebrow">GROWTH</p><h3>$79<span> / month</span></h3><p>Advanced experimentation and higher operating limits.</p><Link to="/login">Continue in Shopify ↗</Link></article>
+        <article className="plan-card"><p className="eyebrow">SCALE</p><h3>$149<span> / month</span></h3><p>Expanded limits and advanced analytics.</p><Link to="/login">Continue in Shopify ↗</Link></article>
       </div><p className="pricing-note">Subscriptions are billed through Shopify. Plan limits and feature entitlements are enforced in the application.</p></section>
     </main>
     <footer className="site-footer"><Link to="/" className="brand"><Mark/><span>KERNIQ</span></Link><span>Offers engineered for profit.</span><span>© {new Date().getFullYear()} KERNIQ</span></footer>
