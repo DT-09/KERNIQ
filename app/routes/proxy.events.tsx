@@ -37,7 +37,8 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   let validOfferId: string | null = null;
   if (offerId) {
     const offer = await db.offer.findFirst({ where: { id: offerId, shopDomain: session.shop } });
-    if (offer) validOfferId = offer.id;
+    if (!offer) return new Response(null, { status: 404 });
+    validOfferId = offer.id;
   }
 
   try {
