@@ -1,19 +1,28 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import { Form, Link, useLoaderData, useActionData } from "react-router";
-import { authenticate } from "../shopify.server";
+import { authenticate, GROWTH_PLAN, LAUNCH_PLAN, SCALE_PLAN, isBillingTestMode } from "../shopify.server";
+import { getPlanLimits } from "../lib/plans.server";
 import db from "../db.server";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { session } = await authenticate.admin(request);
-  const [offers, products] = await Promise.all([
+  const [offers, products, billing] = await Promise.all([
     db.offer.findMany({ where: { shopDomain: session.shop }, orderBy: { createdAt: "desc" } }),
     db.product.findMany({ where: { shopDomain: session.shop, status: "ACTIVE" }, select: { shopifyId: true, title: true }, orderBy: { title: "asc" }, take: 500 }),
+    (async () => { const { billing } = await authenticate.admin(request); return billing.check({ plans: [LAUNCH_PLAN, GROWTH_PLAN, SCALE_PLAN], isTest: isBillingTestMode }); })(),
   ]);
-  return { offers, products };
+  const planName = billing.appSubscriptions[0]?.name ?? "Launch";
+  const limits = getPlanLimits(planName) ?? getPlanLimits("Launch")!;
+  return { offers, products, planName, maxOffers: limits.maxOffers };
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
-  const { session } = await authenticate.admin(request);
+  const { session, billing } = await authenticate.admin(request);
+  const subscription = await billing.check({ plans: [LAUNCH_PLAN, GROWTH_PLAN, SCALE_PLAN], isTest: isBillingTestMode });
+  const planName = subscription.appSubscriptions[0]?.name ?? "Launch";
+  const limits = getPlanLimits(planName) ?? getPlanLimits("Launch")!;
+  const existingOffers = await db.offer.count({ where: { shopDomain: session.shop } });
+  if (existingOffers >= limits.maxOffers) return { error: `Your ${planName} plan allows up to ${limits.maxOffers} offers. Change your plan to create more.` };
   const form = await request.formData();
   const name = String(form.get("name") ?? "").trim();
   const productShopifyId = String(form.get("productShopifyId") ?? "");
@@ -38,12 +47,12 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 };
 
 export default function Offers() {
-  const { offers, products } = useLoaderData<typeof loader>();
+  const { offers, products, planName, maxOffers } = useLoaderData<typeof loader>();
   const result = useActionData<typeof action>();
   return <main className="admin-shell">
     <header className="admin-heading"><div><p className="eyebrow">OFFER ORCHESTRATION</p><h1>Offers</h1><p className="muted">Create reviewed cart recommendations from your store catalog.</p></div></header>
     <section className="panel">
-      <h2>Create a cart recommendation</h2>
+      <h2>Create a cart recommendation</h2><p className="muted">{offers.length} of {maxOffers} offers used on the {planName} plan.</p>
       {products.length === 0 ? <div className="empty-state"><p>Sync your active product catalog before creating an offer.</p><Link className="button button-primary" to="/app/settings">Sync catalog</Link></div> :
         <Form method="post" className="offer-form">
           <label>Offer name<input name="name" minLength={3} maxLength={80} required placeholder="e.g. Harness + travel bowl" /></label>
