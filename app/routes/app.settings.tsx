@@ -1,6 +1,6 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import { Form, useActionData, useLoaderData } from "react-router";
-import { authenticate } from "../shopify.server";
+import { authenticate, GROWTH_PLAN, LAUNCH_PLAN, SCALE_PLAN, isBillingTestMode } from "../shopify.server";
 import db from "../db.server";
 import { syncCatalog } from "../lib/sync.server";
 import { syncRecentOrders } from "../lib/orders.server";
@@ -12,7 +12,9 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
-  const { admin, session } = await authenticate.admin(request);
+  const { admin, session, billing } = await authenticate.admin(request);
+  const subscription = await billing.check({ plans: [LAUNCH_PLAN, GROWTH_PLAN, SCALE_PLAN], isTest: isBillingTestMode });
+  if (!subscription.hasActivePayment) return { error: "An active KERNIQ subscription is required to sync store data." };
   try {
     const catalog = await syncCatalog(admin, session.shop);
     const orders = await syncRecentOrders(admin, session.shop);
