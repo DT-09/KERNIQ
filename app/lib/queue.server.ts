@@ -1,6 +1,6 @@
 import { PgBoss } from "pg-boss";
 
-const QUEUE_NAME = "kern iq-store-sync";
+const QUEUE_NAME = "kerniq-store-sync";
 
 declare global {
   // eslint-disable-next-line no-var
