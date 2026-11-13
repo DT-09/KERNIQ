@@ -1,4 +1,7 @@
 import { Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
+import stylesheet from "./styles/global.css?url";
+
+export const links = () => [{ rel: "stylesheet", href: stylesheet }];
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
