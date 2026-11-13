@@ -1,8 +1,20 @@
-import type { ActionFunctionArgs } from "react-router";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import { authenticate } from "../shopify.server";
 import db from "../db.server";
 
 const allowedEvents = new Set(["impression", "add_to_cart"]);
+
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const { session } = await authenticate.public.appProxy(request);
+  if (!session) return Response.json({ active: false }, { status: 401 });
+  const offerId = new URL(request.url).searchParams.get("offerId");
+  if (!offerId) return Response.json({ active: false });
+  const offer = await db.offer.findFirst({
+    where: { id: offerId, shopDomain: session.shop, status: "active" },
+    select: { id: true },
+  });
+  return Response.json({ active: Boolean(offer) });
+};
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { session } = await authenticate.public.appProxy(request);
@@ -28,31 +40,29 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const eventKey = typeof input.eventKey === "string" ? input.eventKey : "";
   const eventType = typeof input.eventType === "string" ? input.eventType : "";
   const productShopifyId = typeof input.productShopifyId === "string" ? input.productShopifyId : "";
-  const offerId = typeof input.offerId === "string" ? input.offerId : null;
+  const offerId = typeof input.offerId === "string" ? input.offerId : "";
 
-  if (!/^[a-f0-9-]{36}$/i.test(eventKey) || !allowedEvents.has(eventType) || !/^gid:\/\/shopify\/Product\/[0-9]+$/.test(productShopifyId)) {
+  if (!/^[a-f0-9-]{36}$/i.test(eventKey) || !allowedEvents.has(eventType) || !/^gid:\/\/shopify\/Product\/[0-9]+$/.test(productShopifyId) || !offerId) {
     return new Response(null, { status: 400 });
   }
 
-  let validOfferId: string | null = null;
-  if (offerId) {
-    const offer = await db.offer.findFirst({ where: { id: offerId, shopDomain: session.shop } });
-    if (!offer) return new Response(null, { status: 404 });
-    validOfferId = offer.id;
-  }
+  const offer = await db.offer.findFirst({
+    where: { id: offerId, shopDomain: session.shop, status: "active" },
+    select: { id: true },
+  });
+  if (!offer) return new Response(null, { status: 403 });
 
   try {
     await db.offerEvent.create({
       data: {
         shopDomain: session.shop,
         eventKey,
-        offerId: validOfferId,
+        offerId: offer.id,
         productShopifyId,
         payload: { eventType },
       },
     });
   } catch (error) {
-    // Duplicate event keys are safe to ignore; other database failures are surfaced.
     if (error && typeof error === "object" && "code" in error && error.code === "P2002") {
       return new Response(null, { status: 204 });
     }
@@ -61,5 +71,3 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   return new Response(null, { status: 204 });
 };
-
-export const loader = async () => new Response(null, { status: 405, headers: { Allow: "POST" } });
