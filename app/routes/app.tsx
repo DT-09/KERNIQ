@@ -21,7 +21,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 export default function EmbeddedApp() {
   const { apiKey } = useLoaderData<typeof loader>();
   return (
-    <AppProvider embedded apiKey={apiKey}>
+    <AppProvider apiKey={apiKey}>
       <NavMenu>
         <Link to="/app" rel="home">Overview</Link>
         <Link to="/app/catalog">Catalog</Link>
