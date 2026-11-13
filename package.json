@@ -14,7 +14,8 @@
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate deploy",
     "setup": "prisma generate && prisma migrate deploy",
-    "deploy": "shopify app deploy"
+    "deploy": "shopify app deploy",
+    "test": "tsx --test tests/**/*.test.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.19.0",
@@ -37,6 +38,7 @@
     "@types/react-dom": "^18.3.7",
     "typescript": "^5.9.3",
     "vite": "^7.3.1",
-    "vite-tsconfig-paths": "^6.0.4"
+    "vite-tsconfig-paths": "^6.0.4",
+    "tsx": "^4.20.6"
   }
 }
