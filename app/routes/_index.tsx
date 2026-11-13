@@ -27,7 +27,7 @@ export default function Home() {
       <section className="statement" id="method"><p className="eyebrow">THE KERNIQ METHOD</p><h2>Revenue is a signal.<br/><em>Evidence is the standard.</em></h2><p>More revenue can still mean less profit. KERNIQ starts with observed order history and known product costs, then keeps storefront changes under merchant control.</p></section>
       <section className="platform-section" id="platform"><div className="section-heading"><p className="eyebrow">ONE CONNECTED SYSTEM</p><h2>From product data<br/>to better decisions.</h2></div><div className="feature-grid">
         <article><span>01 / DISCOVER</span><h3>Product relationships</h3><p>Find products that appear together in real order history. Rank affinity with support, confidence, and lift.</p></article>
-        <article><span>02 / PROTECT</span><h3>Cost transparency</h3><p>See variant unit costs exposed by Shopify. Unknown costs stay unknown; the system does not fill gaps with guesses.</p></article>
+        <article><span>02 / PROTECT</span><h3>Cost transparency</h3><p>Combine Shopify unit costs with merchant-configured payment fees, fulfillment, and shipping assumptions. Missing inputs stay visible; the system does not fill gaps with guesses.</p></article>
         <article><span>03 / DEPLOY</span><h3>Offer orchestration</h3><p>Create cart recommendation drafts and add the optional theme block only after review.</p></article>
         <article><span>04 / MEASURE</span><h3>Incrementality</h3><p>Keep every storefront change explicit. Drafts do not alter the live theme until a merchant adds and saves the block.</p></article>
       </div></section>
