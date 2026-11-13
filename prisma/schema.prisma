@@ -51,6 +51,10 @@ model StoreSettings {
   defaultCurrency  String?
   defaultCogsMode  String   @default("unknown")
   attributionDays  Int      @default(7)
+  paymentFeeBps    Int?
+  fulfillmentCostMinor Int?
+  shippingSubsidyMinor Int?
+  minimumContributionMinor Int?
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 }
