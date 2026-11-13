@@ -19,10 +19,9 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { session, billing } = await authenticate.admin(request);
   const subscription = await billing.check({ plans: [LAUNCH_PLAN, GROWTH_PLAN, SCALE_PLAN], isTest: isBillingTestMode });
+  if (!subscription.hasActivePayment) return { error: "An active KERNIQ subscription is required to manage offers." };
   const planName = subscription.appSubscriptions[0]?.name ?? "Launch";
   const limits = getPlanLimits(planName) ?? getPlanLimits("Launch")!;
-  const existingOffers = await db.offer.count({ where: { shopDomain: session.shop } });
-  if (existingOffers >= limits.maxOffers) return { error: `Your ${planName} plan allows up to ${limits.maxOffers} offers. Change your plan to create more.` };
   const form = await request.formData();
   const intent = String(form.get("intent") ?? "");
   const offerId = String(form.get("offerId") ?? "");
@@ -36,6 +35,8 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     await db.offer.update({ where: { id: offer.id }, data: { status: intent === "activate" ? "active" : "paused" } });
     return { success: true, status: intent === "activate" ? "active" : "paused" };
   }
+  const existingOffers = await db.offer.count({ where: { shopDomain: session.shop } });
+  if (existingOffers >= limits.maxOffers) return { error: `Your ${planName} plan allows up to ${limits.maxOffers} offers. Change your plan to create more.` };
   const name = String(form.get("name") ?? "").trim();
   const productShopifyId = String(form.get("productShopifyId") ?? "");
   if (name.length < 3 || name.length > 80) return { error: "Offer name must be between 3 and 80 characters." };
