@@ -15,7 +15,7 @@
     "db:migrate": "prisma migrate deploy",
     "setup": "prisma generate && prisma migrate deploy",
     "deploy": "shopify app deploy",
-    "test": "tsx --test tests/**/*.test.ts"
+    "test": "tsx --test tests/*.test.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.19.0",
