@@ -15,7 +15,8 @@
     "db:migrate": "prisma migrate deploy",
     "setup": "prisma generate && prisma migrate deploy",
     "deploy": "shopify app deploy",
-    "test": "tsx --test tests/*.test.ts"
+    "test": "tsx --test tests/*.test.ts",
+    "worker": "tsx workers/worker.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.19.0",
@@ -29,7 +30,8 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router": "7.18.2",
-    "@react-router/fs-routes": "7.18.2"
+    "@react-router/fs-routes": "7.18.2",
+    "pg-boss": "^12.38.2"
   },
   "devDependencies": {
     "@react-router/dev": "7.18.2",
