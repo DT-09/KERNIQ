@@ -24,6 +24,18 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const existingOffers = await db.offer.count({ where: { shopDomain: session.shop } });
   if (existingOffers >= limits.maxOffers) return { error: `Your ${planName} plan allows up to ${limits.maxOffers} offers. Change your plan to create more.` };
   const form = await request.formData();
+  const intent = String(form.get("intent") ?? "");
+  const offerId = String(form.get("offerId") ?? "");
+  if (intent === "activate" || intent === "pause") {
+    const offer = await db.offer.findFirst({ where: { id: offerId, shopDomain: session.shop } });
+    if (!offer) return { error: "Offer not found for this store." };
+    if (intent === "activate") {
+      const config = offer.config && typeof offer.config === "object" ? offer.config as Record<string, unknown> : {};
+      if (typeof config.productShopifyId !== "string") return { error: "This offer has no valid product selection." };
+    }
+    await db.offer.update({ where: { id: offer.id }, data: { status: intent === "activate" ? "active" : "paused" } });
+    return { success: true, status: intent === "activate" ? "active" : "paused" };
+  }
   const name = String(form.get("name") ?? "").trim();
   const productShopifyId = String(form.get("productShopifyId") ?? "");
   if (name.length < 3 || name.length > 80) return { error: "Offer name must be between 3 and 80 characters." };
@@ -60,11 +72,11 @@ export default function Offers() {
           <button className="button button-primary" type="submit">Create draft</button>
         </Form>}
       {result && "error" in result && result.error ? <p className="form-error">{result.error}</p> : null}
-      {result && "success" in result && result.success ? <p className="form-success">Draft created. It has not changed your storefront.</p> : null}
+      {result && "success" in result && result.success ? <p className="form-success">Offer saved. Review its status and storefront placement before sending traffic.</p> : null}
     </section>
     <section className="panel"><h2>Offer library</h2>{offers.length === 0 ? <p className="muted">No offers yet. Create a draft to begin.</p> :
-      <div className="offer-list">{offers.map((offer) => <article key={offer.id} className="offer-item"><div><strong>{offer.name}</strong><small>Cart recommendation · created {new Date(offer.createdAt).toLocaleDateString()}</small><code className="offer-id">{offer.id}</code></div><span className="status status-neutral">{offer.status}</span></article>)}</div>}
+      <div className="offer-list">{offers.map((offer) => <article key={offer.id} className="offer-item"><div><strong>{offer.name}</strong><small>Cart recommendation · created {new Date(offer.createdAt).toLocaleDateString()}</small><code className="offer-id">{offer.id}</code></div><div className="offer-controls"><span className={offer.status === "active" ? "status status-good" : "status status-neutral"}>{offer.status}</span><Form method="post"><input type="hidden" name="offerId" value={offer.id}/><button className="button button-secondary" name="intent" value={offer.status === "active" ? "pause" : "activate"} type="submit">{offer.status === "active" ? "Pause" : offer.status === "paused" ? "Reactivate" : "Activate"}</button></Form></div></article>)}</div>}
     </section>
-    <section className="notice"><p className="eyebrow">STOREFRONT ACTIVATION</p><h2>Merchant-controlled placement</h2><p>After reviewing a draft, add the KERNIQ Product recommendation block to your cart template in the Shopify theme editor and select the same product, then paste the offer ID shown in the offer library into the block settings. The block never changes the storefront until you add and save it.</p></section>
+    <section className="notice"><p className="eyebrow">STOREFRONT ACTIVATION</p><h2>Merchant-controlled placement</h2><p>After reviewing a draft, add the KERNIQ Product recommendation block to your cart template in the Shopify theme editor and select the same product, then paste the offer ID shown in the offer library into the block settings and save the theme. Return here and activate the offer. The block remains hidden until its offer is active; pause it here to hide it on subsequent page loads.</p></section>
   </main>;
 }
