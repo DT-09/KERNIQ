@@ -3,13 +3,24 @@ import { Link, useLoaderData } from "react-router";
 import { authenticate, GROWTH_PLAN, LAUNCH_PLAN, SCALE_PLAN, isBillingTestMode } from "../shopify.server";
 import { getPlanLimits } from "../lib/plans.server";
 import { getProductRelationships } from "../lib/relationships.server";
+import db from "../db.server";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { session, billing } = await authenticate.admin(request);
   const subscription = await billing.check({ plans: [LAUNCH_PLAN, GROWTH_PLAN, SCALE_PLAN], isTest: isBillingTestMode });
   const planName = subscription.appSubscriptions[0]?.name ?? "Launch";
   const limits = getPlanLimits(planName) ?? getPlanLimits("Launch")!;
-  return { ...(await getProductRelationships(session.shop, limits.maxOrdersAnalyzed)), planName, maxOrdersAnalyzed: limits.maxOrdersAnalyzed };
+  const [relationships, events] = await Promise.all([
+    getProductRelationships(session.shop, limits.maxOrdersAnalyzed),
+    db.offerEvent.findMany({ where: { shopDomain: session.shop }, select: { payload: true }, orderBy: { occurredAt: "desc" }, take: 5000 }),
+  ]);
+  const engagement = events.reduce((counts, event) => {
+    const payload = event.payload && typeof event.payload === "object" ? event.payload as Record<string, unknown> : {};
+    if (payload.eventType === "impression") counts.impressions += 1;
+    if (payload.eventType === "add_to_cart") counts.addToCart += 1;
+    return counts;
+  }, { impressions: 0, addToCart: 0 });
+  return { ...relationships, engagement, planName, maxOrdersAnalyzed: limits.maxOrdersAnalyzed };
 };
 
 function percent(value: number | null) {
@@ -32,6 +43,6 @@ export default function Analytics() {
           {data.pairs.map((pair, index) => <tr key={index}><td>{pair.productA}</td><td>{pair.productB}</td><td>{pair.coOrders}</td><td>{percent(pair.support)}</td><td>{percent(pair.confidenceAtoB)}</td><td>{pair.lift == null ? "—" : pair.lift.toFixed(2) + "×"}</td></tr>)}
         </tbody></table></div>}
     </section>
-    <p className="muted footnote">These are observational associations, not proof that displaying one product causes another to sell. Lift is undefined when the baseline purchase rate is zero. Your {data.planName} plan analyzes up to {data.maxOrdersAnalyzed.toLocaleString()} recent synced orders.</p>
+    <p className="muted footnote">Offer engagement counts represent block impressions and add-to-cart submissions only; they are not completed orders or incremental revenue. Product relationships are observational associations, not proof that displaying one product causes another to sell. Lift is undefined when the baseline purchase rate is zero. Your {data.planName} plan analyzes up to {data.maxOrdersAnalyzed.toLocaleString()} recent synced orders.</p>
   </main>;
 }
