@@ -11,7 +11,7 @@
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "target": "ES2022",
-    "types": ["@react-router/node", "vite/client"],
+    "types": ["@react-router/node", "vite/client", "node"],
     "rootDirs": [".", "./.react-router/types"]
   }
 }
