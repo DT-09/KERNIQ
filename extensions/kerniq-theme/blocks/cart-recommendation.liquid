@@ -1,7 +1,7 @@
 {% assign offer_product = block.settings.product %}
 {% if offer_product != blank %}
   {% assign offer_variant = offer_product.selected_or_first_available_variant %}
-  <section class="kerniq-cart-offer" aria-label="{{ block.settings.heading | escape }}" data-product-id="gid://shopify/Product/{{ offer_product.id }}" data-offer-id="{{ block.settings.offer_id | escape }}">
+  <section hidden class="kerniq-cart-offer" aria-label="{{ block.settings.heading | escape }}" data-product-id="gid://shopify/Product/{{ offer_product.id }}" data-offer-id="{{ block.settings.offer_id | escape }}">
     <div class="kerniq-cart-offer__copy">
       <p class="kerniq-cart-offer__eyebrow">A CONSIDERED ADDITION</p>
       <h3>{{ block.settings.heading | escape }}</h3>
