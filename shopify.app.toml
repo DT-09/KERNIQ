@@ -19,3 +19,8 @@ uri = "/webhooks/app/scopes_update"
 [[webhooks.subscriptions]]
 compliance_topics = ["customers/data_request", "customers/redact", "shop/redact"]
 uri = "/webhooks/compliance"
+
+[app_proxy]
+url = "/proxy"
+prefix = "apps"
+subpath = "kerniq"
