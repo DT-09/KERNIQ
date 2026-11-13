@@ -41,3 +41,9 @@ test("product pair metrics use observed order counts", () => {
 test("inconsistent co-purchase counts are rejected", () => {
   assert.throws(() => rankProductPair({ coOrders: 20, ordersWithA: 10, ordersWithB: 50, totalOrders: 100 }), /Inconsistent/);
 });
+
+test("discount ceiling never becomes negative", () => {
+  assert.equal(calculateDiscountCeiling({
+    priceMinor: 1000, unitCostMinor: 900, otherVariableCostMinor: 200, minimumContributionMinor: 100,
+  }), 0);
+});
