@@ -1,20 +1,9 @@
+# Link this configuration to the KERNIQ app in Shopify Dev Dashboard before deployment.
 name = "KERNIQ"
 client_id = ""
-application_url = "https://app.kerniq.com"
-embedded = true
-
-[build]
-automatically_update_urls_on_dev = true
-include_config_on_deploy = true
 
 [access_scopes]
 scopes = "read_products,read_inventory,read_orders"
-
-[auth]
-redirect_urls = [
-  "https://app.kerniq.com/auth/callback",
-  "https://app.kerniq.com/auth/shopify/callback"
-]
 
 [webhooks]
 api_version = "2026-10"
