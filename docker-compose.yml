@@ -20,6 +20,8 @@ services:
     command: npm run worker
     environment:
       WORKER_CONCURRENCY: "1"
+    healthcheck:
+      disable: true
     depends_on:
       web:
         condition: service_healthy
