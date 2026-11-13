@@ -1,12 +1,12 @@
 import db from "../db.server";
 import { rankProductPair } from "./profit.server";
 
-export async function getProductRelationships(shopDomain: string) {
+export async function getProductRelationships(shopDomain: string, maxOrders = 5000) {
   const orders = await db.order.findMany({
     where: { shopDomain },
     select: { id: true, lineItems: { select: { productShopifyId: true } } },
     orderBy: { createdAtShopify: "desc" },
-    take: 5000,
+    take: maxOrders,
   });
 
   const orderSets = orders.map((order) => [...new Set(
