@@ -43,6 +43,10 @@ export default function Analytics() {
           {data.pairs.map((pair, index) => <tr key={index}><td>{pair.productA}</td><td>{pair.productB}</td><td>{pair.coOrders}</td><td>{percent(pair.support)}</td><td>{percent(pair.confidenceAtoB)}</td><td>{pair.lift == null ? "—" : pair.lift.toFixed(2) + "×"}</td></tr>)}
         </tbody></table></div>}
     </section>
+    <section className="metric-grid">
+      <article className="metric"><span className="metric-label">Offer impressions</span><strong>{data.engagement.impressions.toLocaleString()}</strong><span className="metric-note">Cart block became visible</span></article>
+      <article className="metric"><span className="metric-label">Add-to-cart submissions</span><strong>{data.engagement.addToCart.toLocaleString()}</strong><span className="metric-note">Recommendation form submitted</span></article>
+    </section>
     <p className="muted footnote">Offer engagement counts represent block impressions and add-to-cart submissions only; they are not completed orders or incremental revenue. Product relationships are observational associations, not proof that displaying one product causes another to sell. Lift is undefined when the baseline purchase rate is zero. Your {data.planName} plan analyzes up to {data.maxOrdersAnalyzed.toLocaleString()} recent synced orders.</p>
   </main>;
 }
