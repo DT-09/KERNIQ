@@ -1,11 +1,15 @@
 import type { LoaderFunctionArgs } from "react-router";
 import { useLoaderData } from "react-router";
-import { authenticate } from "../shopify.server";
+import { authenticate, GROWTH_PLAN, LAUNCH_PLAN, SCALE_PLAN, isBillingTestMode } from "../shopify.server";
+import { getPlanLimits } from "../lib/plans.server";
 import { getProductRelationships } from "../lib/relationships.server";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const { session } = await authenticate.admin(request);
-  return getProductRelationships(session.shop);
+  const { session, billing } = await authenticate.admin(request);
+  const subscription = await billing.check({ plans: [LAUNCH_PLAN, GROWTH_PLAN, SCALE_PLAN], isTest: isBillingTestMode });
+  const planName = subscription.appSubscriptions[0]?.name ?? "Launch";
+  const limits = getPlanLimits(planName) ?? getPlanLimits("Launch")!;
+  return { ...(await getProductRelationships(session.shop, limits.maxOrdersAnalyzed)), planName, maxOrdersAnalyzed: limits.maxOrdersAnalyzed };
 };
 
 function percent(value: number | null) {
@@ -17,7 +21,7 @@ export default function Analytics() {
   return <main className="admin-shell">
     <header className="admin-heading"><div><p className="eyebrow">PRODUCT INTELLIGENCE</p><h1>Relationships</h1><p className="muted">Observed co-purchase patterns in synced order history.</p></div></header>
     <section className="metric-grid">
-      <article className="metric"><span className="metric-label">Orders analyzed</span><strong>{data.totalOrders.toLocaleString()}</strong><span className="metric-note">Synced order records</span></article>
+      <article className="metric"><span className="metric-label">Orders analyzed</span><strong>{data.totalOrders.toLocaleString()}</strong><span className="metric-note">Latest plan allowance · {data.maxOrdersAnalyzed.toLocaleString()} orders</span></article>
       <article className="metric"><span className="metric-label">Products analyzed</span><strong>{data.productsAnalyzed.toLocaleString()}</strong><span className="metric-note">Distinct products in orders</span></article>
       <article className="metric"><span className="metric-label">Relationships</span><strong>{data.pairs.length.toLocaleString()}</strong><span className="metric-note">Top observed pairs</span></article>
     </section>
@@ -28,6 +32,6 @@ export default function Analytics() {
           {data.pairs.map((pair, index) => <tr key={index}><td>{pair.productA}</td><td>{pair.productB}</td><td>{pair.coOrders}</td><td>{percent(pair.support)}</td><td>{percent(pair.confidenceAtoB)}</td><td>{pair.lift == null ? "—" : pair.lift.toFixed(2) + "×"}</td></tr>)}
         </tbody></table></div>}
     </section>
-    <p className="muted footnote">These are observational associations, not proof that displaying one product causes another to sell. Lift is undefined when the baseline purchase rate is zero. Only the latest 5,000 synced orders are analyzed.</p>
+    <p className="muted footnote">These are observational associations, not proof that displaying one product causes another to sell. Lift is undefined when the baseline purchase rate is zero. Your {data.planName} plan analyzes up to {data.maxOrdersAnalyzed.toLocaleString()} recent synced orders.</p>
   </main>;
 }
