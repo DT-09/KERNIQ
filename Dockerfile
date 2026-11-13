@@ -9,7 +9,8 @@ ARG SHOPIFY_API_KEY=build-placeholder
 ARG SHOPIFY_API_SECRET=build-placeholder
 ARG SHOPIFY_APP_URL=https://localhost
 ARG SCOPES=read_products,read_inventory,read_orders
-ENV SHOPIFY_API_KEY=$SHOPIFY_API_KEY SHOPIFY_API_SECRET=$SHOPIFY_API_SECRET SHOPIFY_APP_URL=$SHOPIFY_APP_URL SCOPES=$SCOPES
+ARG DATABASE_URL=postgresql://build:build@localhost:5432/kerniq
+ENV SHOPIFY_API_KEY=$SHOPIFY_API_KEY SHOPIFY_API_SECRET=$SHOPIFY_API_SECRET SHOPIFY_APP_URL=$SHOPIFY_APP_URL SCOPES=$SCOPES DATABASE_URL=$DATABASE_URL
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npx prisma generate && npm run build
