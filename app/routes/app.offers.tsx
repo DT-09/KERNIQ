@@ -63,8 +63,8 @@ export default function Offers() {
       {result && "success" in result && result.success ? <p className="form-success">Draft created. It has not changed your storefront.</p> : null}
     </section>
     <section className="panel"><h2>Offer library</h2>{offers.length === 0 ? <p className="muted">No offers yet. Create a draft to begin.</p> :
-      <div className="offer-list">{offers.map((offer) => <article key={offer.id} className="offer-item"><div><strong>{offer.name}</strong><small>Cart recommendation · created {new Date(offer.createdAt).toLocaleDateString()}</small></div><span className="status status-neutral">{offer.status}</span></article>)}</div>}
+      <div className="offer-list">{offers.map((offer) => <article key={offer.id} className="offer-item"><div><strong>{offer.name}</strong><small>Cart recommendation · created {new Date(offer.createdAt).toLocaleDateString()}</small><code className="offer-id">{offer.id}</code></div><span className="status status-neutral">{offer.status}</span></article>)}</div>}
     </section>
-    <section className="notice"><p className="eyebrow">STOREFRONT ACTIVATION</p><h2>Merchant-controlled placement</h2><p>After reviewing a draft, add the KERNIQ Product recommendation block to your cart template in the Shopify theme editor and select the same product. The block never changes the storefront until you add and save it.</p></section>
+    <section className="notice"><p className="eyebrow">STOREFRONT ACTIVATION</p><h2>Merchant-controlled placement</h2><p>After reviewing a draft, add the KERNIQ Product recommendation block to your cart template in the Shopify theme editor and select the same product, then paste the offer ID shown in the offer library into the block settings. The block never changes the storefront until you add and save it.</p></section>
   </main>;
 }
