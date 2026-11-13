@@ -5,13 +5,13 @@ import { getPlanLimits } from "../lib/plans.server";
 import db from "../db.server";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const { session } = await authenticate.admin(request);
-  const [offers, products, billing] = await Promise.all([
+  const { session, billing } = await authenticate.admin(request);
+  const [offers, products] = await Promise.all([
     db.offer.findMany({ where: { shopDomain: session.shop }, orderBy: { createdAt: "desc" } }),
     db.product.findMany({ where: { shopDomain: session.shop, status: "ACTIVE" }, select: { shopifyId: true, title: true }, orderBy: { title: "asc" }, take: 500 }),
-    (async () => { const { billing } = await authenticate.admin(request); return billing.check({ plans: [LAUNCH_PLAN, GROWTH_PLAN, SCALE_PLAN], isTest: isBillingTestMode }); })(),
   ]);
-  const planName = billing.appSubscriptions[0]?.name ?? "Launch";
+  const subscription = await billing.check({ plans: [LAUNCH_PLAN, GROWTH_PLAN, SCALE_PLAN], isTest: isBillingTestMode });
+  const planName = subscription.appSubscriptions[0]?.name ?? "Launch";
   const limits = getPlanLimits(planName) ?? getPlanLimits("Launch")!;
   return { offers, products, planName, maxOffers: limits.maxOffers };
 };
