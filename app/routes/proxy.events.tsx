@@ -8,12 +8,17 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const { session } = await authenticate.public.appProxy(request);
   if (!session) return new Response(null, { status: 401 });
 
-  const contentLength = Number(request.headers.get("content-length") ?? "0");
-  if (contentLength > 4096) return new Response(null, { status: 413 });
+  let rawBody: string;
+  try {
+    rawBody = await request.text();
+  } catch {
+    return new Response(null, { status: 400 });
+  }
+  if (new TextEncoder().encode(rawBody).byteLength > 4096) return new Response(null, { status: 413 });
 
   let body: unknown;
   try {
-    body = await request.json();
+    body = JSON.parse(rawBody);
   } catch {
     return new Response(null, { status: 400 });
   }
