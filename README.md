@@ -43,7 +43,7 @@ KERNIQ intentionally avoids unsupported claims:
 
 1. Install Node.js 22.12 or later.
 2. Copy `.env.example` to `.env` and populate Shopify credentials and a PostgreSQL connection.
-3. Install dependencies: `npm install`.
+3. Install dependencies: `npm install`. The repository currently has no committed npm lockfile; generate and commit one before relying on fully reproducible production installs.
 4. Generate Prisma client: `npm run db:generate`.
 5. Apply migrations: `npm run db:migrate`.
 6. Start the Shopify development flow: `npm run dev`.
