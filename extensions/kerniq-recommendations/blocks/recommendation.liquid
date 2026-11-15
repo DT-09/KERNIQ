@@ -1,13 +1,13 @@
 <section
-  class="kern iq-recommendation"
+  class="kerniq-recommendation"
   data-kerniq-recommendation
   data-offer-id="{{ block.settings.offer_id | escape }}"
   data-heading="{{ block.settings.heading | escape }}"
   aria-live="polite"
 >
-  <p class="kern iq-recommendation__eyebrow">{{ block.settings.heading | escape }}</p>
-  <div class="kern iq-recommendation__content">
-    <span class="kern iq-recommendation__loading">{{ block.settings.loading_text | escape }}</span>
+  <p class="kerniq-recommendation__eyebrow">{{ block.settings.heading | escape }}</p>
+  <div class="kerniq-recommendation__content">
+    <span class="kerniq-recommendation__loading">{{ block.settings.loading_text | escape }}</span>
   </div>
 </section>
 
@@ -15,8 +15,8 @@
 {
   "name": "KERNIQ recommendation",
   "target": "content",
-  "stylesheet": "kern iq-recommendation.css",
-  "javascript": "kern iq-recommendation.js",
+  "stylesheet": "kerniq-recommendation.css",
+  "javascript": "kerniq-recommendation.js",
   "settings": [
     {
       "type": "text",
