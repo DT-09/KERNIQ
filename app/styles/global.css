@@ -10,3 +10,95 @@
 .offer-controls{display:flex;align-items:center;gap:10px}.button-secondary{background:#f0f2ed;border:1px solid #dbe1d8;color:#27302b;padding:8px 12px;border-radius:4px;font-size:11px;cursor:pointer}.button-secondary:hover{background:#e5e9df}
 .offer-controls{flex-wrap:wrap}.offer-controls form{margin:0}
 .economics-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:20px}.economics-form label{display:grid;gap:7px;font-size:12px;color:#58635c}.economics-form label span{font-size:10px;color:#89918b}.economics-form input{height:42px;border:1px solid #dce2dc;border-radius:4px;padding:0 10px;background:#fff;color:#202626}.economics-form button{justify-self:start}.economics-form input:focus{outline:2px solid #c9d96b;outline-offset:1px}@media(max-width:560px){.economics-form{grid-template-columns:1fr}}
+
+
+/* KERNIQ marketing system — restrained ink, mineral and brass palette. */
+.marketing{--ink:#101a21;--ink-soft:#17242c;--paper:#efeee8;--paper-muted:#c4c9c4;--brass:#c8a56b;--brass-soft:#dfc79d;background:var(--ink);color:var(--paper)}
+.marketing .site-nav{background:rgba(16,26,33,.9);border-bottom-color:#ffffff16}
+.marketing .brand-mark{color:var(--brass)}
+.marketing .eyebrow{color:var(--brass);letter-spacing:.18em}
+.marketing .nav-links a:hover,.marketing .text-link:hover{color:var(--brass-soft)}
+.marketing .nav-cta{border-color:#ffffff35}
+.marketing .nav-cta span,.marketing .text-link span{color:var(--brass)}
+.marketing .hero{min-height:720px;gap:5vw;padding-top:92px;padding-bottom:92px}
+.marketing .hero h1{font-size:clamp(54px,6.5vw,96px);letter-spacing:-.07em}
+.marketing .hero h1 em,.marketing .statement h2 em,.marketing .principle h2 em{color:var(--brass);font-family:"Playfair Display",serif}
+.marketing .hero-lede{color:#c0c7c6;max-width:530px}
+.marketing .button-primary{background:var(--brass);color:#111a1f;transition:transform .2s ease,background .2s ease}
+.marketing .button-primary:hover{background:var(--brass-soft);transform:translateY(-2px)}
+.marketing .hero-footnote{color:#829099}
+.marketing .hero-visual{height:520px;border:1px solid #ffffff16;background:radial-gradient(circle at 50% 48%,#26343b 0,#17242c 48%,#111b21 78%);overflow:hidden}
+.marketing .visual-topline,.marketing .visual-foot{position:absolute;left:22px;right:22px;display:flex;justify-content:space-between;color:#87949a;font:9px "DM Mono",monospace;letter-spacing:.13em}
+.marketing .visual-topline{top:20px}
+.marketing .visual-foot{bottom:20px;align-items:center}
+.marketing .visual-foot i{width:4px;height:4px;border-radius:50%;background:var(--brass)}
+.marketing .visual-orbit{position:absolute;border:1px solid #c8a56b35;border-radius:50%;aspect-ratio:1}
+.marketing .orbit-one{width:350px}
+.marketing .orbit-two{width:245px;border-style:dashed;border-color:#ffffff22}
+.marketing .visual-core{width:150px;height:150px;border-radius:50%;background:#1d2a31;border:1px solid #c8a56b99;box-shadow:0 0 80px #c8a56b17;z-index:2}
+.marketing .visual-core .brand-mark{width:50px;height:50px}
+.marketing .visual-core span{font:9px/1.5 "DM Mono",monospace;letter-spacing:.15em;color:#e5dfd1;text-align:center}
+.marketing .signal-card{position:absolute;z-index:3;display:grid;gap:7px;min-width:185px;padding:13px 15px;background:#1a2930;border:1px solid #ffffff2c;box-shadow:0 15px 40px #0005}
+.marketing .signal-card span{font:8px "DM Mono",monospace;color:var(--brass);letter-spacing:.13em}
+.marketing .signal-card strong{font-size:13px;font-weight:600;color:#f0eee7}
+.marketing .signal-card small{font-size:10px;color:#a8b3b5}
+.marketing .signal-a{top:92px;left:15px}
+.marketing .signal-b{top:225px;right:12px}
+.marketing .signal-c{bottom:72px;left:38px}
+.marketing .proof-strip{display:grid;grid-template-columns:.8fr 1.2fr;gap:8vw;padding:105px clamp(22px,9vw,140px);background:var(--paper);color:#1b272c}
+.marketing .proof-intro h2,.marketing .method-section h2,.marketing .integrity-section h2,.marketing .closing-cta h2{font-size:clamp(38px,4.8vw,62px);line-height:1.05;letter-spacing:-.055em;margin:24px 0}
+.marketing .proof-intro h2 em,.marketing .method-section h2 em,.marketing .integrity-section h2 em,.marketing .closing-cta h2 em{font-family:"Playfair Display",serif;font-weight:500;color:#927448}
+.marketing .proof-strip .eyebrow{color:#927448}
+.marketing .proof-list{border-top:1px solid #c9c9bd}
+.marketing .proof-row{display:grid;grid-template-columns:1fr auto;gap:7px 18px;padding:17px 0;border-bottom:1px solid #d5d5ca}
+.marketing .proof-row>span{font-size:12px;color:#5c6868}
+.marketing .proof-row strong{font:10px "DM Mono",monospace;color:#6f5937;text-transform:uppercase;letter-spacing:.08em}
+.marketing .proof-row small{grid-column:1/-1;color:#7c8580;font-size:11px}
+.marketing .platform-section{background:#17242c;border-color:#ffffff12;padding-top:110px;padding-bottom:115px}
+.marketing .section-heading{align-items:end;gap:30px}
+.marketing .section-heading>p{max-width:260px;color:#aeb9ba;font-size:13px;line-height:1.8}
+.marketing .section-heading h2{font-size:clamp(40px,4.7vw,62px)}
+.marketing .feature-grid{border-top-color:#ffffff2b}
+.marketing .feature-grid article{border-right-color:#ffffff20;min-height:245px}
+.marketing .feature-grid article>span{color:var(--brass)}
+.marketing .feature-grid h3{font-size:19px}
+.marketing .feature-grid p{color:#b0babb;max-width:260px}
+.marketing .method-section{display:grid;grid-template-columns:1fr 1fr;gap:10vw;align-items:center;padding:115px clamp(22px,12vw,180px);background:var(--paper);color:#1b272c}
+.marketing .method-section .eyebrow,.marketing .integrity-section .eyebrow{color:#927448}
+.marketing .method-section>div:first-child>p:last-child{max-width:480px;color:#687473;font-size:14px;line-height:1.9}
+.marketing .method-steps{border-top:1px solid #d0d0c5}
+.marketing .method-steps>div{display:flex;gap:22px;padding:17px 0;border-bottom:1px solid #d0d0c5}
+.marketing .method-steps b{font:10px "DM Mono",monospace;color:#927448;padding-top:3px}
+.marketing .method-steps span{display:grid;gap:5px}
+.marketing .method-steps strong{font-size:14px}
+.marketing .method-steps small{font-size:11px;line-height:1.6;color:#75807c}
+.marketing .integrity-section{display:grid;grid-template-columns:1fr 1fr;gap:10vw;padding:115px clamp(22px,12vw,180px);align-items:start;background:#111d24}
+.marketing .integrity-copy>p{color:#bdc5c3;font-size:14px;line-height:1.9;margin-top:0}
+.marketing .integrity-copy ul{list-style:none;padding:0;margin:25px 0 0;border-top:1px solid #ffffff24}
+.marketing .integrity-copy li{padding:12px 0;border-bottom:1px solid #ffffff24;color:#d5d7d0;font-size:12px}
+.marketing .integrity-copy li:before{content:"—";color:var(--brass);margin-right:12px}
+.marketing .pricing-section{background:#e9e8e0;color:#1b272c;padding-top:110px;padding-bottom:110px}
+.marketing .pricing-section>.eyebrow{color:#927448}
+.marketing .pricing-section h2{font-size:clamp(38px,4.8vw,62px)}
+.marketing .pricing-intro{max-width:540px;margin:0 auto;color:#687473;font-size:13px;line-height:1.8}
+.marketing .pricing-grid{max-width:1100px;gap:14px}
+.marketing .plan-card{background:#f4f3ed;border:1px solid #d5d3c8;padding:32px;transition:transform .2s ease,border-color .2s ease}
+.marketing .plan-card:hover{transform:translateY(-4px);border-color:#a88b5b}
+.marketing .plan-card .eyebrow{color:#927448}
+.marketing .plan-card h3{font-size:42px;color:#1b272c}
+.marketing .plan-card h3 span{color:#7a817d}
+.marketing .plan-card>p:not(.eyebrow){color:#66716e}
+.marketing .plan-card a{color:#795f37;border-bottom:1px solid #bda67f;padding-bottom:4px}
+.marketing .plan-featured{background:#202e35;border-color:#a88b5b;color:#f1eee5}
+.marketing .plan-featured h3{color:#f1eee5}
+.marketing .plan-featured .eyebrow{color:var(--brass)}
+.marketing .plan-featured>p:not(.eyebrow){color:#c2c9c6}
+.marketing .plan-featured a{color:#e1c48f;border-color:#9d8357}
+.marketing .pricing-note{color:#747c77;line-height:1.7}
+.marketing .closing-cta{display:flex;align-items:center;justify-content:space-between;gap:30px;padding:95px clamp(22px,12vw,180px);background:#17242c}
+.marketing .closing-cta h2{margin-bottom:0}
+.marketing .site-footer{background:#0d171d;color:#829096;border-top:1px solid #ffffff16}
+.marketing .site-footer .brand{color:#f0eee7}
+.marketing .site-footer .brand-mark{color:var(--brass)}
+@media(max-width:850px){.marketing .hero{grid-template-columns:1fr;padding-top:70px}.marketing .hero-visual{height:470px}.marketing .proof-strip,.marketing .method-section,.marketing .integrity-section{grid-template-columns:1fr;gap:38px}.marketing .section-heading{display:flex;flex-direction:column;align-items:flex-start}.marketing .closing-cta{align-items:flex-start;flex-direction:column}}
+@media(max-width:560px){.marketing .hero h1{font-size:56px}.marketing .hero-visual{height:420px;margin:0;transform:none}.marketing .visual-orbit.orbit-one{width:280px}.marketing .visual-orbit.orbit-two{width:205px}.marketing .signal-card{min-width:145px;padding:10px}.marketing .signal-card small{max-width:130px}.marketing .signal-a{top:72px;left:8px}.marketing .signal-b{top:195px;right:7px}.marketing .signal-c{bottom:63px;left:8px}.marketing .proof-strip,.marketing .method-section,.marketing .integrity-section{padding:78px 24px}.marketing .platform-section,.marketing .pricing-section{padding:78px 24px}.marketing .closing-cta{padding:75px 24px}.marketing .feature-grid{grid-template-columns:1fr}.marketing .feature-grid article{border-right:0;border-bottom:1px solid #ffffff24;margin:0;min-height:auto;padding:24px 0}.marketing .site-footer{gap:14px;flex-direction:column;align-items:flex-start}}
