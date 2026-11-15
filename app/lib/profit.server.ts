@@ -102,7 +102,13 @@ export function rankProductPair(input: {
   for (const [key, value] of Object.entries(input)) {
     if (!Number.isSafeInteger(value) || value < 0) throw new Error(`${key} must be a non-negative integer`);
   }
-  if (totalOrders === 0 || coOrders > ordersWithA || coOrders > ordersWithB || ordersWithA > totalOrders || ordersWithB > totalOrders) {
+  if (totalOrders === 0) {
+    if (coOrders !== 0 || ordersWithA !== 0 || ordersWithB !== 0) {
+      throw new Error("Inconsistent co-purchase counts");
+    }
+    return { support: 0, confidence: 0, lift: null };
+  }
+  if (coOrders > ordersWithA || coOrders > ordersWithB || ordersWithA > totalOrders || ordersWithB > totalOrders) {
     throw new Error("Inconsistent co-purchase counts");
   }
   const support = coOrders / totalOrders;
