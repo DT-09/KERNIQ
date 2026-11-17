@@ -21,7 +21,7 @@ type OrderNode = {
 };
 
 function decimals(currency: string) {
-  return new Intl.NumberFormat("en", { style: "currency", currency }).resolvedOptions().maximumFractionDigits;
+  return new Intl.NumberFormat("en", { style: "currency", currency }).resolvedOptions().maximumFractionDigits ?? 2;
 }
 function minor(amount: string, currency: string) {
   const n = Number(amount);
@@ -52,7 +52,7 @@ export async function syncRecentOrders(admin: ShopifyAdmin, shopDomain: string) 
     let cursor: string | null = null;
     let hasNextPage = true;
     while (hasNextPage) {
-      const data = await query<{ orders: Connection<OrderNode> }>(admin, `
+      const data: { orders: Connection<OrderNode> } = await query<{ orders: Connection<OrderNode> }>(admin, `
         query KERNIQRecentOrders($first: Int!, $after: String, $search: String!) {
           orders(first: $first, after: $after, query: $search, sortKey: CREATED_AT) {
             edges {
