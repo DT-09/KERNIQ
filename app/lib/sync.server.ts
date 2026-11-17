@@ -16,7 +16,7 @@ type ProductNode = {
 };
 
 function minorUnits(currency: string): number {
-  return new Intl.NumberFormat("en", { style: "currency", currency }).resolvedOptions().maximumFractionDigits;
+  return new Intl.NumberFormat("en", { style: "currency", currency }).resolvedOptions().maximumFractionDigits ?? 2;
 }
 
 function toMinor(amount: string | null | undefined, currency: string): number | null {
@@ -53,7 +53,7 @@ export async function syncCatalog(admin: ShopifyAdmin, shopDomain: string) {
     let cursor: string | null = null;
     let hasNextPage = true;
     while (hasNextPage) {
-      const data = await graph<{ products: Connection<ProductNode> }>(admin, `
+      const data: { products: Connection<ProductNode> } = await graph<{ products: Connection<ProductNode> }>(admin, `
         query KERNIQCatalog($first: Int!, $after: String) {
           products(first: $first, after: $after, sortKey: TITLE) {
             edges {
