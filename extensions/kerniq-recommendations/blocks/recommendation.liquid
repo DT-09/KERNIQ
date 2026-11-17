@@ -1,0 +1,41 @@
+<section
+  class="kerniq-recommendation"
+  data-kerniq-recommendation
+  data-offer-id="{{ block.settings.offer_id | escape }}"
+  data-heading="{{ block.settings.heading | escape }}"
+  aria-live="polite"
+>
+  <p class="kerniq-recommendation__eyebrow">{{ block.settings.heading | escape }}</p>
+  <div class="kerniq-recommendation__content">
+    <span class="kerniq-recommendation__loading">{{ block.settings.loading_text | escape }}</span>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "KERNIQ recommendation",
+  "target": "content",
+  "stylesheet": "kerniq-recommendation.css",
+  "javascript": "kerniq-recommendation.js",
+  "settings": [
+    {
+      "type": "text",
+      "id": "offer_id",
+      "label": "KERNIQ offer ID",
+      "info": "Copy the offer ID from the KERNIQ merchant app."
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "A considered addition"
+    },
+    {
+      "type": "text",
+      "id": "loading_text",
+      "label": "Loading text",
+      "default": "Finding a relevant addition…"
+    }
+  ]
+}
+{% endschema %}

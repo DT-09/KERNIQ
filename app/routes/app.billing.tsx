@@ -1,7 +1,12 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import { Form, useActionData, useLoaderData } from "react-router";
-import { authenticate, LAUNCH_PLAN, GROWTH_PLAN, SCALE_PLAN, isBillingTestMode } from "../shopify.server";
+import { authenticate, isBillingTestMode } from "../shopify.server";
 
+// Keep presentation constants in the route module so the client bundle never imports
+// the server-only Shopify application module for values used by the rendered UI.
+const LAUNCH_PLAN = "Launch";
+const GROWTH_PLAN = "Growth";
+const SCALE_PLAN = "Scale";
 const plans = [LAUNCH_PLAN, GROWTH_PLAN, SCALE_PLAN] as const;
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {

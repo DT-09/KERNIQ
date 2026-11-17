@@ -41,3 +41,24 @@ test("product pair metrics use observed order counts", () => {
 test("inconsistent co-purchase counts are rejected", () => {
   assert.throws(() => rankProductPair({ coOrders: 20, ordersWithA: 10, ordersWithB: 50, totalOrders: 100 }), /Inconsistent/);
 });
+
+test("zero-order baseline has undefined lift instead of infinity", () => {
+  const result = rankProductPair({ coOrders: 0, ordersWithA: 0, ordersWithB: 0, totalOrders: 0 });
+  assert.equal(result.support, 0);
+  assert.equal(result.confidence, 0);
+  assert.equal(result.lift, null);
+});
+
+test("negative monetary inputs are rejected", () => {
+  assert.throws(() => calculateContribution({
+    unitPriceMinor: -1, quantity: 1, discountMinor: 0,
+    costs: { unitCostMinor: 0, paymentFeeMinor: 0, fulfillmentCostMinor: 0, shippingSubsidyMinor: 0 },
+  }), /non-negative safe integer/);
+});
+
+test("unsafe gross revenue is rejected before calculation", () => {
+  assert.throws(() => calculateContribution({
+    unitPriceMinor: Number.MAX_SAFE_INTEGER, quantity: 2, discountMinor: 0,
+    costs: { unitCostMinor: 0, paymentFeeMinor: 0, fulfillmentCostMinor: 0, shippingSubsidyMinor: 0 },
+  }), /safe integer range/);
+});

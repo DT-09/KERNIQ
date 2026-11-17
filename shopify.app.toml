@@ -3,7 +3,7 @@ name = "KERNIQ"
 client_id = ""
 
 [access_scopes]
-scopes = "read_products,read_inventory,read_orders"
+scopes = "read_products,read_inventory,read_orders,write_app_proxy"
 
 [webhooks]
 api_version = "2026-10"

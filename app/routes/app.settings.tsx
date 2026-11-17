@@ -5,7 +5,7 @@ import db from "../db.server";
 import { getQueue, QUEUE_NAME } from "../lib/queue.server";
 
 function currencyDigits(currency: string) {
-  return new Intl.NumberFormat("en", { style: "currency", currency }).resolvedOptions().maximumFractionDigits;
+  return new Intl.NumberFormat("en", { style: "currency", currency }).resolvedOptions().maximumFractionDigits ?? 2;
 }
 function parseMoney(value: FormDataEntryValue | null, currency: string): number | null | "invalid" {
   const raw = String(value ?? "").trim();

@@ -16,7 +16,7 @@ type ProductNode = {
 };
 
 function minorUnits(currency: string): number {
-  return new Intl.NumberFormat("en", { style: "currency", currency }).resolvedOptions().maximumFractionDigits;
+  return new Intl.NumberFormat("en", { style: "currency", currency }).resolvedOptions().maximumFractionDigits ?? 2;
 }
 
 function toMinor(amount: string | null | undefined, currency: string): number | null {
@@ -53,7 +53,7 @@ export async function syncCatalog(admin: ShopifyAdmin, shopDomain: string) {
     let cursor: string | null = null;
     let hasNextPage = true;
     while (hasNextPage) {
-      const data = await graph<{ products: Connection<ProductNode> }>(admin, `
+      const data: { products: Connection<ProductNode> } = await graph<{ products: Connection<ProductNode> }>(admin, `
         query KERNIQCatalog($first: Int!, $after: String) {
           products(first: $first, after: $after, sortKey: TITLE) {
             edges {
@@ -115,6 +115,59 @@ export async function syncCatalog(admin: ShopifyAdmin, shopDomain: string) {
             },
           });
           recordsRead += 1;
+        }
+
+        // Shopify paginates variants independently from the parent product connection.
+        // Drain every variant page so large catalogs are not silently truncated at 250.
+        let variantCursor = p.variants.pageInfo.endCursor;
+        let moreVariants = p.variants.pageInfo.hasNextPage;
+        while (moreVariants) {
+          if (!variantCursor) throw new Error("Shopify variant pagination returned no cursor");
+          const variantPage = await graph<{ product: { variants: Connection<ProductNode["variants"]["edges"][number]["node"]> } | null }>(
+            admin,
+            `query KERNIQVariantPage($id: ID!, $after: String) {
+              product(id: $id) {
+                variants(first: 250, after: $after) {
+                  edges {
+                    cursor
+                    node {
+                      id title sku price compareAtPrice inventoryQuantity
+                      inventoryItem { unitCost { amount currencyCode } }
+                    }
+                  }
+                  pageInfo { hasNextPage endCursor }
+                }
+              }
+            }`,
+            { id: p.id, after: variantCursor },
+          );
+          if (!variantPage.product) throw new Error("Shopify product disappeared during variant pagination");
+          for (const vEdge of variantPage.product.variants.edges) {
+            const v = vEdge.node;
+            const priceMinor = toMinor(v.price, shopData.shop.currencyCode);
+            if (priceMinor == null) continue;
+            const costMinor = v.inventoryItem?.unitCost
+              ? toMinor(v.inventoryItem.unitCost.amount, v.inventoryItem.unitCost.currencyCode)
+              : null;
+            await db.variant.upsert({
+              where: { productId_shopifyId: { productId: product.id, shopifyId: v.id } },
+              create: {
+                productId: product.id, shopifyId: v.id, title: v.title, sku: v.sku,
+                priceMinor, compareAtMinor: toMinor(v.compareAtPrice, shopData.shop.currencyCode),
+                inventoryQty: v.inventoryQuantity, unitCostMinor: costMinor,
+                costSource: costMinor == null ? "unknown" : "shopify",
+              },
+              update: {
+                title: v.title, sku: v.sku, priceMinor,
+                compareAtMinor: toMinor(v.compareAtPrice, shopData.shop.currencyCode),
+                inventoryQty: v.inventoryQuantity, unitCostMinor: costMinor,
+                costSource: costMinor == null ? "unknown" : "shopify",
+              },
+            });
+            recordsRead += 1;
+          }
+          moreVariants = variantPage.product.variants.pageInfo.hasNextPage;
+          variantCursor = variantPage.product.variants.pageInfo.endCursor;
         }
       }
       hasNextPage = data.products.pageInfo.hasNextPage;

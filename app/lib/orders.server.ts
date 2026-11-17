@@ -21,7 +21,7 @@ type OrderNode = {
 };
 
 function decimals(currency: string) {
-  return new Intl.NumberFormat("en", { style: "currency", currency }).resolvedOptions().maximumFractionDigits;
+  return new Intl.NumberFormat("en", { style: "currency", currency }).resolvedOptions().maximumFractionDigits ?? 2;
 }
 function minor(amount: string, currency: string) {
   const n = Number(amount);
@@ -52,7 +52,7 @@ export async function syncRecentOrders(admin: ShopifyAdmin, shopDomain: string) 
     let cursor: string | null = null;
     let hasNextPage = true;
     while (hasNextPage) {
-      const data = await query<{ orders: Connection<OrderNode> }>(admin, `
+      const data: { orders: Connection<OrderNode> } = await query<{ orders: Connection<OrderNode> }>(admin, `
         query KERNIQRecentOrders($first: Int!, $after: String, $search: String!) {
           orders(first: $first, after: $after, query: $search, sortKey: CREATED_AT) {
             edges {
@@ -128,6 +128,63 @@ export async function syncRecentOrders(admin: ShopifyAdmin, shopDomain: string) 
               discountMinor: Math.max(0, gross - discounted),
             },
           });
+        }
+
+        // Line items have their own cursor. Continue fetching beyond the first 250
+        // so basket-affinity calculations use the complete order, not a truncated basket.
+        let lineCursor = o.lineItems.pageInfo.endCursor;
+        let moreLines = o.lineItems.pageInfo.hasNextPage;
+        while (moreLines) {
+          if (!lineCursor) throw new Error("Shopify line-item pagination returned no cursor");
+          const linePage = await query<{ node: { lineItems: Connection<OrderNode["lineItems"]["edges"][number]["node"]> } | null }>(
+            admin,
+            `query KERNIQOrderLinePage($id: ID!, $after: String) {
+              node(id: $id) {
+                ... on Order {
+                  lineItems(first: 250, after: $after) {
+                    edges {
+                      cursor
+                      node {
+                        id title quantity
+                        originalUnitPriceSet { shopMoney { amount currencyCode } }
+                        discountedTotalSet { shopMoney { amount currencyCode } }
+                        variant { id product { id } }
+                      }
+                    }
+                    pageInfo { hasNextPage endCursor }
+                  }
+                }
+              }
+            }`,
+            { id: o.id, after: lineCursor },
+          );
+          if (!linePage.node) throw new Error("Shopify order disappeared during line-item pagination");
+          for (const lineEdge of linePage.node.lineItems.edges) {
+            const line = lineEdge.node;
+            const lineCurrency = line.originalUnitPriceSet.shopMoney.currencyCode || currency;
+            const gross = minor(line.originalUnitPriceSet.shopMoney.amount, lineCurrency) * line.quantity;
+            const discounted = minor(line.discountedTotalSet.shopMoney.amount, lineCurrency);
+            await db.orderLineItem.upsert({
+              where: { orderId_shopifyLineId: { orderId: order.id, shopifyLineId: line.id } },
+              create: {
+                orderId: order.id, shopifyLineId: line.id,
+                variantShopifyId: line.variant?.id ?? null,
+                productShopifyId: line.variant?.product?.id ?? null,
+                title: line.title, quantity: line.quantity,
+                unitPriceMinor: minor(line.originalUnitPriceSet.shopMoney.amount, lineCurrency),
+                discountMinor: Math.max(0, gross - discounted), refundMinor: 0,
+              },
+              update: {
+                variantShopifyId: line.variant?.id ?? null,
+                productShopifyId: line.variant?.product?.id ?? null,
+                title: line.title, quantity: line.quantity,
+                unitPriceMinor: minor(line.originalUnitPriceSet.shopMoney.amount, lineCurrency),
+                discountMinor: Math.max(0, gross - discounted),
+              },
+            });
+          }
+          moreLines = linePage.node.lineItems.pageInfo.hasNextPage;
+          lineCursor = linePage.node.lineItems.pageInfo.endCursor;
         }
         recordsRead += 1;
       }
