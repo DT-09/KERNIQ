@@ -14,7 +14,7 @@ async function main() {
   boss.on("failed", ({ job, error }) => console.error("[worker] job failed", job.id, error));
   await boss.start();
   await boss.createQueue(QUEUE_NAME, { retryLimit: 3, retryDelay: 30, retryBackoff: true });
-  await boss.work<SyncJob>(QUEUE_NAME, { teamSize: Number(process.env.WORKER_CONCURRENCY ?? 1) }, async ([job]) => {
+  await boss.work<SyncJob>(QUEUE_NAME, async ([job]) => {
     const shopDomain = job.data?.shopDomain;
     if (!shopDomain || !/^[a-z0-9][a-z0-9-]*\.myshopify\.com$/i.test(shopDomain)) {
       throw new Error("Invalid store domain in sync job.");
